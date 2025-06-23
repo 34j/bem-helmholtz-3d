@@ -122,7 +122,7 @@ class BEMCalculator[TArray: Array]:
             The value of the scattered wave function at x of shape (...,).
 
         """
-        return single_layer_potential(
+        return -single_layer_potential(
             x=x,
             simplex_vertices=self.simplex_vertices,
             k=self.k,
