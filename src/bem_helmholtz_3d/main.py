@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from typing import Literal, overload
 
 import attrs
 import quadpy
@@ -149,7 +150,26 @@ class BEMCalculator[TArray: Array]:
         return self.uin(x) + self.uscat(x)
 
 
-def bem_matrix[TArray: Array](
+@overload
+def bem(
+    *,
+    simplex_vertices: Array,
+    uin: Callable[[Array], Array],
+    k: Array,
+    quadrature_points_and_weights: tuple[Array, Array] | None = None,
+    return_matrix: Literal[False] = ...,
+) -> BEMCalculator[Array]: ...
+@overload
+def bem(
+    *,
+    simplex_vertices: Array,
+    uin: Callable[[Array], Array],
+    k: Array,
+    quadrature_points_and_weights: tuple[Array, Array] | None = None,
+    return_matrix: Literal[True] = ...,
+) -> tuple[Array, Array]: ...
+def bem[TArray: Array](
+    *,
     simplex_vertices: TArray,
     uin: Callable[[TArray], TArray],
     k: TArray,
@@ -194,6 +214,7 @@ def bem_matrix[TArray: Array](
         simplex_vertices=simplex_vertices[..., None, :, :, :],
         k=k[..., None],
         quadrature_points_and_weights=quadrature_points_and_weights,
+        sum_all_elements=False,
     )
     # (..., n_simplex (x), 1)
     rhs = uin(centers)
