@@ -26,8 +26,12 @@ classifiers = [
 ]
 
 dependencies = [
+  "array-api-compat>=1.11.2",
+  "legacy-quadpy>=0.16.10",
+  "meshio>=5.3.5",
   "rich>=10",
   "typer>=0.15,<1",
+  "types-array-api>=1.1.2",
 ]
 urls."Bug Tracker" = "https://github.com/34j/bem-helmholtz-3d/issues"
 urls.Changelog = "https://github.com/34j/bem-helmholtz-3d/blob/main/CHANGELOG.md"
