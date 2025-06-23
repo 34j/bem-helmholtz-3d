@@ -38,7 +38,8 @@ def single_layer_potential[TArray: Array](
     fx : TArray, optional
         The function values at the (P0) element of shape (..., n_simplex).
     sum_all_elements : bool, optional
-        Whether to sum over all simplices or return the value for each simplex separately, by default True.
+        Whether to sum over all simplices or return the value for each simplex separately,
+        by default True.
 
     Returns
     -------
@@ -58,9 +59,9 @@ def single_layer_potential[TArray: Array](
             f"The last dimension of fx must match the number of simplices, "
             f"got {fx.shape=} and {simplex_vertices.shape=}."
         )
-    extra_shapes = (x.shape[:-1], simplex_vertices.shape[:-3], k.shape)
+    extra_shapes = [x.shape[:-1], simplex_vertices.shape[:-3], k.shape]
     if fx is not None:
-        extra_shapes += (fx.shape[:-1],)
+        extra_shapes.append(fx.shape[:-1])
     if xp.unique_values([len(s) for s in extra_shapes]).size != 1:
         raise ValueError(
             "The shapes of x, simplex_vertices, k, and fx must be compatible. "
@@ -87,7 +88,8 @@ def single_layer_potential[TArray: Array](
         raise ValueError(
             "Weights must have the same shape as points except for the last dimension."
         )
-    # (..., n_simplex, d (coordinates), d (vertices)) -> (..., n_simplex, n_quadrature, d (coordinates), d (vertices))
+    # (..., n_simplex, d (coordinates), d (vertices)) ->
+    # (..., n_simplex, n_quadrature, d (coordinates), d (vertices))
     # (n_quadrature, d (vertices)) -> (1, n_quadrature, 1, d (vertices))
     # (..., n_simplex, n_quadrature, d (coordinates))
     points_simplex = xp.vecdot(
@@ -113,10 +115,13 @@ def single_layer_potential[TArray: Array](
 
 @attrs.frozen(kw_only=True)
 class BEMCalculator[TArray: Array]:
+    """Calculate fields from the solution of the boundary element method."""
+
     simplex_vertices: TArray
     """The vertices of the simplices of shape (..., n_simplex, d (vertices), d (coordinates))."""
     uin: Callable[[TArray], TArray]
-    """The incident wave function which takes x of shape (..., d) and returns a value of shape (...,)."""
+    """The incident wave function which takes x of shape (..., d) and returns a value
+    of shape (...,)."""
     sol: TArray
     """The neumann or dirichlet data of shape (..., n_simplex)."""
     k: TArray
@@ -125,7 +130,7 @@ class BEMCalculator[TArray: Array]:
     """Quadrature points and weights for the integration, by default None.
     points are of shape (n_quadrature, d (vertices)) (barycentric coordinates),
     weights are of shape (n_quadrature,)."""
-    
+
     @property
     def extra_dim(self) -> int:
         """The number of extra dimensions ..."""
@@ -138,7 +143,8 @@ class BEMCalculator[TArray: Array]:
         Parameters
         ----------
         x : TArray
-            The point at which to evaluate the scattered wave function of shape (...(x), d (coordinates)).
+            The point at which to evaluate the scattered wave function
+            of shape (...(x), d (coordinates)).
 
         Returns
         -------
@@ -158,7 +164,9 @@ class BEMCalculator[TArray: Array]:
 
     def utotal(self, x: TArray, /) -> TArray:
         """
-        Total wave function at the point x, which is the sum of the incident and scattered wave functions.
+        Total wave function at the point x.
+
+        The sum of the incident and scattered wave functions.
 
         Parameters
         ----------
@@ -218,10 +226,13 @@ def bem[TArray: Array](
         Quadrature points and weights for the integration, by default None.
         points are of shape (n_quadrature, d (vertices)) (barycentric coordinates),
         weights are of shape (n_quadrature,).
+    return_matrix : bool, optional
+        If True, return the left-hand side and right-hand side matrices of the linear system,
+        otherwise return BEMCalculator with the solution of the linear system,
 
     Returns
     -------
-    BEMCalculator[TArray]
+    BEMCalculator[TArray] | tuple[TArray, TArray]
         An object containing the boundary element method matrix and the solution.
         If `return_matrix` is True, it returns the left-hand side and right-hand side matrices.
         Otherwise, it returns the solution of the linear system.

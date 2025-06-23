@@ -24,16 +24,12 @@ def test_bem():
     calc = bem(simplex_vertices=simplex_vertices, k=xp.asarray(k), uin=uin)
 
     x, y = xp.meshgrid(xp.linspace(-4, 4, 100), xp.linspace(-4, 4, 100), indexing="ij")
-    x = xp.reshape(x, (-1,))
-    y = xp.reshape(y, (-1,))
     points = xp.stack([x, y], axis=-1)
     u = calc.utotal(points)
-    print(u.shape)
+
+    # heatmap
     fig, ax = plt.subplots()
-    ax.set_aspect("equal")
-    ax.contourf(x, y, xp.real(u).reshape((100, 100)), levels=100, cmap="viridis")
+    c = ax.pcolormesh(x, y, xp.real(u).reshape((100, 100)), shading="auto")
     ax.set_title("Real part of the total potential")
-    plt.colorbar(
-        ax.contourf(x, y, xp.real(u).reshape((100, 100)), levels=100, cmap="viridis"), ax=ax
-    )
-    plt.show()
+    fig.colorbar(c, ax=ax)
+    fig.savefig("tests/2d.png")
