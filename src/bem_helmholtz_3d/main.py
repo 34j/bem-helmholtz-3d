@@ -74,7 +74,8 @@ def single_layer_potential[TArray: Array](
     if d is None or d < 1:
         raise ValueError(f"The last dimension of simplex_vertices must be at least 1, got {d}.")
     if quadrature_points_and_weights is None:
-        scheme = quadpy.tn.grundmann_moeller(d - 1, 2)
+        # scheme = quadpy.tn.grundmann_moeller(d - 1, 2)
+        scheme = quadpy.tn.grundmann_moeller(d - 1, 5)
         points, weights = scheme.points.T, scheme.weights
     else:
         # (n_quadrature, d (vertices)), (n_quadrature,)
@@ -97,6 +98,13 @@ def single_layer_potential[TArray: Array](
     )
     # (..., n_simplex, n_quadrature)
     fundamental_sol = fundamental_solution(xp.asarray(d), x[..., None, None, :] - points_simplex, k)
+    fundamental_sol = np.nan_to_num(fundamental_sol, nan=0.0)
+    if xp.any(xp.isnan(fundamental_sol)):
+        raise ValueError(
+            "The fundamental solution contains NaN values. "
+            "This may happen if x is too close to the center of the simplex. "
+            f"NaN rate: {xp.sum(xp.isnan(fundamental_sol)) / fundamental_sol.size:.2%}."
+        )
     # (..., n_simplex)
     vol = simplex_volume(simplex_vertices)
     # (..., n_simplex)
@@ -253,6 +261,16 @@ def bem[TArray: Array](
     rhs = uin(centers)
     if return_matrix:
         return lhs, rhs
+    if xp.any(xp.isnan(lhs)):
+        raise ValueError(
+            "The left-hand side matrix contains NaN values. "
+            f"NaN rate: {xp.sum(xp.isnan(lhs)) / lhs.size:.2%}."
+        )
+    if xp.any(xp.isnan(rhs)):
+        raise ValueError(
+            "The right-hand side vector contains NaN values. "
+            f"NaN rate: {xp.sum(xp.isnan(rhs)) / rhs.size:.2%}."
+        )
     sol = xp.linalg.solve(lhs, rhs)
     return BEMCalculator(
         simplex_vertices=simplex_vertices,

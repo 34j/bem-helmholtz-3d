@@ -43,5 +43,5 @@ def simplex_volume[TArray: Array](simplex_vertices: TArray, /) -> TArray:
         ],
         axis=-1,
     )
-    coef = (-1) ** (n + 1) / (xp.prod(xp.arange(n + 1))) ** 2 / 2**n
+    coef = (-1) ** (n + 1) / (xp.prod(xp.arange(n) + 1)) ** 2 / 2**n
     return coef * xp.linalg.det(mat)

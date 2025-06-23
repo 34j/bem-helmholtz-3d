@@ -25,11 +25,11 @@ def test_bem():
 
     x, y = xp.meshgrid(xp.linspace(-4, 4, 100), xp.linspace(-4, 4, 100), indexing="ij")
     points = xp.stack([x, y], axis=-1)
-    u = calc.utotal(points)
+    u = calc.uscat(points)
 
     # heatmap
     fig, ax = plt.subplots()
-    c = ax.pcolormesh(x, y, xp.real(u).reshape((100, 100)), shading="auto")
+    c = ax.pcolormesh(x, y, xp.real(u), shading="auto")
     ax.set_title("Real part of the total potential")
     fig.colorbar(c, ax=ax)
     fig.savefig("tests/2d.png")
