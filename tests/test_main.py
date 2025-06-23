@@ -28,6 +28,7 @@ def test_bem():
     y = xp.reshape(y, (-1,))
     points = xp.stack([x, y], axis=-1)
     u = calc.utotal(points)
+    print(u.shape)
     fig, ax = plt.subplots()
     ax.set_aspect("equal")
     ax.contourf(x, y, xp.real(u).reshape((100, 100)), levels=100, cmap="viridis")

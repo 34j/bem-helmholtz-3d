@@ -125,6 +125,11 @@ class BEMCalculator[TArray: Array]:
     """Quadrature points and weights for the integration, by default None.
     points are of shape (n_quadrature, d (vertices)) (barycentric coordinates),
     weights are of shape (n_quadrature,)."""
+    
+    @property
+    def extra_dim(self) -> int:
+        """The number of extra dimensions ..."""
+        return self.sol.ndim - 1
 
     def uscat(self, x: TArray, /) -> TArray:
         """
@@ -133,20 +138,21 @@ class BEMCalculator[TArray: Array]:
         Parameters
         ----------
         x : TArray
-            The point at which to evaluate the scattered wave function of shape (..., d (coordinates)).
+            The point at which to evaluate the scattered wave function of shape (...(x), d (coordinates)).
 
         Returns
         -------
         TArray
-            The value of the scattered wave function at x of shape (...,).
+            The value of the scattered wave function at x of shape (...(x),...(sol)).
 
         """
+        extra_dim = x.ndim - 1
         return -single_layer_potential(
-            x=x,
-            simplex_vertices=self.simplex_vertices,
-            k=self.k,
+            x=x[(...,) + (None,) * self.extra_dim + (slice(None),)],
+            simplex_vertices=self.simplex_vertices[(None,) * extra_dim + (...,)],
+            k=self.k[(None,) * extra_dim + (...,)],
             quadrature_points_and_weights=self.quadrature_points_and_weights,
-            fx=self.sol,
+            fx=self.sol[(None,) * extra_dim + (...,)],
             sum_all_elements=True,
         )
 
