@@ -9,9 +9,10 @@ from bem_helmholtz_3d.main import bem
 def test_bem():
     k = 1.0
     N = 10
-    xp = array_namespace(np.e)
+    xp = array_namespace(np.array(0))
 
     def uin[TArray: Array](x: TArray) -> TArray:
+        xp = array_namespace(x)
         return xp.exp(1j * k * x[..., 0])
 
     # (N, 2)

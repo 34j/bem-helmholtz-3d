@@ -2,6 +2,7 @@ from collections.abc import Callable
 from typing import Literal, overload
 
 import attrs
+import numpy as np
 import quadpy
 from array_api._2024_12 import Array
 from array_api_compat import array_namespace
@@ -47,28 +48,45 @@ def single_layer_potential[TArray: Array](
 
     """
     xp = array_namespace(x, simplex_vertices)
-    if simplex_vertices.shape[-2] != simplex_vertices.shape[-1]:
+    if not (x.shape[-1] == simplex_vertices.shape[-2] == simplex_vertices.shape[-1]):
         raise ValueError(
-            f"The last two dimensions of simplex_vertices must match.Got {simplex_vertices.shape=}."
+            f"The last dimension of x and last two dimensions of simplex_vertices must match, "
+            f"got {x.shape=} and {simplex_vertices.shape=}."
         )
+    if fx is not None and fx.shape[-1] != simplex_vertices.shape[-3]:
+        raise ValueError(
+            f"The last dimension of fx must match the number of simplices, "
+            f"got {fx.shape=} and {simplex_vertices.shape=}."
+        )
+    extra_shapes = (x.shape[:-1], simplex_vertices.shape[:-3], k.shape)
+    if fx is not None:
+        extra_shapes += (fx.shape[:-1],)
+    if xp.unique_values([len(s) for s in extra_shapes]).size != 1:
+        raise ValueError(
+            "The shapes of x, simplex_vertices, k, and fx must be compatible. "
+            f"Got {x.shape=}, {simplex_vertices.shape=}, {k.shape=}"
+            + (f", {fx.shape=}" if fx is not None else "")
+            + f", {extra_shapes=}."
+        )
+    np.broadcast_shapes(*[tuple(s) for s in extra_shapes])
     d = simplex_vertices.shape[-1]
     if d is None or d < 1:
         raise ValueError(f"The last dimension of simplex_vertices must be at least 1, got {d}.")
     if quadrature_points_and_weights is None:
-        scheme = quadpy.tn.grundmann_moeller(d, 2)
-        points, weights = scheme.points, scheme.weights
+        scheme = quadpy.tn.grundmann_moeller(d - 1, 2)
+        points, weights = scheme.points.T, scheme.weights
     else:
         # (n_quadrature, d (vertices)), (n_quadrature,)
         points, weights = quadrature_points_and_weights
-        if points.shape[-1] != d:
-            raise ValueError(
-                f"The last dimension of points must match the simplex dimension {d}, "
-                f"got {points.shape[-1]}."
-            )
-        if weights.shape != points.shape[:-1]:
-            raise ValueError(
-                "Weights must have the same shape as points except for the last dimension."
-            )
+    if points.shape[-1] != d:
+        raise ValueError(
+            f"The last dimension of points must match the simplex dimension {d}, "
+            f"got {points.shape[-1]}."
+        )
+    if weights.shape != points.shape[:-1]:
+        raise ValueError(
+            "Weights must have the same shape as points except for the last dimension."
+        )
     # (..., n_simplex, d (coordinates), d (vertices)) -> (..., n_simplex, n_quadrature, d (coordinates), d (vertices))
     # (n_quadrature, d (vertices)) -> (1, n_quadrature, 1, d (vertices))
     # (..., n_simplex, n_quadrature, d (coordinates))
@@ -206,8 +224,6 @@ def bem[TArray: Array](
     xp = array_namespace(simplex_vertices, k)
     # (..., n_simplex (x), d (coordinates))
     centers = xp.mean(simplex_vertices, axis=-1)
-    # (..., n_simplex (x), 1, d (coordinates))
-    centers = centers[..., :, None, :]
     # (..., n_simplex (x), n_simplex (y))
     lhs = xp.asarray(1 / 2) + single_layer_potential(
         x=centers,

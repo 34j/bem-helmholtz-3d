@@ -35,9 +35,9 @@ def simplex_volume[TArray: Array](simplex_vertices: TArray, /) -> TArray:
     )
     mat = xp.concat(
         [
-            xp.concat([dists, xp.ones_like(dists[..., 0, :])], axis=-2),
+            xp.concat([dists, xp.ones_like(dists[..., 0:1, :])], axis=-2),
             xp.concat(
-                [xp.ones_like(dists[..., :, 0]), xp.zeros_like(dists[..., 0, 0])],
+                [xp.ones_like(dists[..., :, 0:1]), xp.zeros_like(dists[..., 0:1, 0:1])],
                 axis=-2,
             ),
         ],
