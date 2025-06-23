@@ -27,6 +27,7 @@ classifiers = [
 
 dependencies = [
   "array-api-compat>=1.11.2",
+  "attrs>=25.3.0",
   "legacy-quadpy>=0.16.10",
   "meshio>=5.3.5",
   "rich>=10",

@@ -218,7 +218,7 @@ def fundamental_solution(
     d : TArray
         The dimension of the space.
     z : TArray
-        The argument of the fundamental solution.
+        The argument of the fundamental solution of shape (..., d (coordinates)).
     k : TArray
         The wave number.
     derivative : bool, optional
@@ -227,9 +227,9 @@ def fundamental_solution(
     Returns
     -------
     TArray
-        The fundamental solution of the Helmholtz equation.
+        The fundamental solution of the Helmholtz equation of shape (...,).
 
     """
     xp = array_namespace(d, z)
     coef = k ** (d - 2) * 1j / (2 * (2 * xp.pi) ** ((d - 1) / 2))
-    return coef * shn1(xp.asarray(0), d, k * xp.abs(z), derivative)
+    return coef * shn1(xp.asarray(0), d, k * xp.linalg.vector_norm(z, axis=-1), derivative)
