@@ -75,7 +75,7 @@ def single_layer_potential[TArray: Array](
         raise ValueError(f"The last dimension of simplex_vertices must be at least 1, got {d}.")
     if quadrature_points_and_weights is None:
         # scheme = quadpy.tn.grundmann_moeller(d - 1, 2)
-        scheme = quadpy.tn.grundmann_moeller(d - 1, 5)
+        scheme = quadpy.tn.grundmann_moeller(d - 1, 7)
         points, weights = scheme.points.T, scheme.weights
     else:
         # (n_quadrature, d (vertices)), (n_quadrature,)
@@ -247,10 +247,11 @@ def bem[TArray: Array](
 
     """
     xp = array_namespace(simplex_vertices, k)
+    n_simplex = simplex_vertices.shape[-3]
     # (..., n_simplex (x), d (coordinates))
     centers = xp.mean(simplex_vertices, axis=-1)
     # (..., n_simplex (x), n_simplex (y))
-    lhs = xp.asarray(1 / 2) + single_layer_potential(
+    lhs = 0.5 * xp.eye(n_simplex) + single_layer_potential(
         x=centers,
         simplex_vertices=simplex_vertices[..., None, :, :, :],
         k=k[..., None],
