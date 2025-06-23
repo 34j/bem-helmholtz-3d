@@ -1,9 +1,12 @@
-from typing import Literal
-from typing import TypeVar
-from scipy.special import jv, jvp, yv, yvp
-from array_api._2024_12 import Array, ArrayNamespace
+from typing import Literal, TypeVar
+
+from array_api._2024_12 import Array
 from array_api_compat import array_namespace
+from scipy.special import jv, jvp, yv, yvp
+
 TArray = TypeVar("TArray", bound=Array)
+
+
 def sjv(
     v: TArray,
     d: TArray,
@@ -11,7 +14,7 @@ def sjv(
     derivative: bool = False,
 ) -> TArray:
     """
-    hyperspherical Bessel function of the first kind.
+    Hyperspherical Bessel function of the first kind.
 
     Parameters
     ----------
@@ -47,11 +50,7 @@ def sjv(
     d_half_minus_1 = d / 2 - 1
     return (
         ivy.sqrt(ivy.pi / 2)
-        * ivy.asarray(
-            (jvp if derivative else jv)(
-                (v + d_half_minus_1), (z)
-            )
-        )
+        * ivy.asarray((jvp if derivative else jv)((v + d_half_minus_1), (z)))
         / (z**d_half_minus_1)
     )
 
@@ -63,7 +62,7 @@ def syv(
     derivative: bool = False,
 ) -> TArray:
     """
-    hyperspherical Bessel function of the second kind.
+    Hyperspherical Bessel function of the second kind.
 
     Parameters
     ----------
@@ -99,11 +98,7 @@ def syv(
     d_half_minus_1 = d / 2 - 1
     return (
         ivy.sqrt(ivy.pi / 2)
-        * ivy.asarray(
-            (yvp if derivative else yv)(
-                (v + d_half_minus_1), (z)
-            )
-        )
+        * ivy.asarray((yvp if derivative else yv)((v + d_half_minus_1), (z)))
         / (z**d_half_minus_1)
     )
 
@@ -115,7 +110,7 @@ def shn1(
     derivative: bool = False,
 ) -> TArray:
     """
-    hyperspherical Hankel function of the first kind.
+    Hyperspherical Hankel function of the first kind.
 
     Parameters
     ----------
@@ -145,7 +140,7 @@ def shn2(
     derivative: bool = False,
 ) -> TArray:
     """
-    hyperspherical Hankel function of the second kind.
+    Hyperspherical Hankel function of the second kind.
 
     Parameters
     ----------
@@ -207,3 +202,34 @@ def szv(
     if type == "h2":
         return shn2(v, d, z, derivative)
     raise ValueError(f"Invalid type {type}.")
+
+
+def fundamental_solution(
+    d: TArray,
+    z: TArray,
+    k: TArray,
+    derivative: bool = False,
+) -> TArray:
+    """
+    Fundamental solution of the Laplace equation in d dimensions.
+
+    Parameters
+    ----------
+    d : TArray
+        The dimension of the space.
+    z : TArray
+        The argument of the fundamental solution.
+    k : TArray
+        The wave number.
+    derivative : bool, optional
+        Whether to compute the derivative of the fundamental solution, by default False
+
+    Returns
+    -------
+    TArray
+        The fundamental solution of the Helmholtz equation.
+
+    """
+    xp = array_namespace(d, z)
+    coef = k ** (d - 2) * 1j / (2 * (2 * xp.pi) ** ((d - 1) / 2))
+    return coef * shn1(xp.asarray(0), d, k * xp.abs(z), derivative)
