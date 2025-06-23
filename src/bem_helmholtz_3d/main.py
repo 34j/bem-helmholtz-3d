@@ -9,32 +9,8 @@ from .simplex import simplex_volume
 from .special import fundamental_solution
 
 
-@attrs.frozen(kw_only=True)
-class BEMCalculator[TArray: Array]:
-    simplex_vertices: TArray
-    uin: Callable[[TArray], TArray]
-    sol: TArray
-    quadrature_points_and_weights: tuple[TArray, TArray] | None = None
-
-    def uscat(self, x: TArray) -> TArray:
-        """
-        Scattered wave function at the point x.
-
-        Parameters
-        ----------
-        x : TArray
-            The point at which to evaluate the scattered wave function.
-
-        Returns
-        -------
-        TArray
-            The value of the scattered wave function at x.
-
-        """
-        ...
-
-
 def single_layer_potential[TArray: Array](
+    *,
     x: TArray,
     simplex_vertices: TArray,
     k: TArray,
@@ -55,6 +31,8 @@ def single_layer_potential[TArray: Array](
         Wavenumber of the Helmholtz equation of shape (...,).
     quadrature_points_and_weights : tuple[TArray, TArray] | None, optional
         Quadrature points and weights for the integration, by default None.
+        points are of shape (n_quadrature, d (vertices)) (barycentric coordinates),
+        weights are of shape (n_quadrature,).
     fx : TArray, optional
         The function values at the (P0) element of shape (..., n_simplex).
     sum_all_elements : bool, optional
@@ -73,6 +51,8 @@ def single_layer_potential[TArray: Array](
             f"The last two dimensions of simplex_vertices must match.Got {simplex_vertices.shape=}."
         )
     d = simplex_vertices.shape[-1]
+    if d is None or d < 1:
+        raise ValueError(f"The last dimension of simplex_vertices must be at least 1, got {d}.")
     if quadrature_points_and_weights is None:
         scheme = quadpy.tn.grundmann_moeller(d, 2)
         points, weights = scheme.points, scheme.weights
@@ -112,6 +92,63 @@ def single_layer_potential[TArray: Array](
     return result
 
 
+@attrs.frozen(kw_only=True)
+class BEMCalculator[TArray: Array]:
+    simplex_vertices: TArray
+    """The vertices of the simplices of shape (..., n_simplex, d (vertices), d (coordinates))."""
+    uin: Callable[[TArray], TArray]
+    """The incident wave function which takes x of shape (..., d) and returns a value of shape (...,)."""
+    sol: TArray
+    """The neumann or dirichlet data of shape (..., n_simplex)."""
+    k: TArray
+    """Wavenumber of the Helmholtz equation of shape (...,)."""
+    quadrature_points_and_weights: tuple[TArray, TArray] | None = None
+    """Quadrature points and weights for the integration, by default None.
+    points are of shape (n_quadrature, d (vertices)) (barycentric coordinates),
+    weights are of shape (n_quadrature,)."""
+
+    def uscat(self, x: TArray, /) -> TArray:
+        """
+        Scattered wave function at the point x.
+
+        Parameters
+        ----------
+        x : TArray
+            The point at which to evaluate the scattered wave function of shape (..., d (coordinates)).
+
+        Returns
+        -------
+        TArray
+            The value of the scattered wave function at x of shape (...,).
+
+        """
+        return single_layer_potential(
+            x=x,
+            simplex_vertices=self.simplex_vertices,
+            k=self.k,
+            quadrature_points_and_weights=self.quadrature_points_and_weights,
+            fx=self.sol,
+            sum_all_elements=True,
+        )
+
+    def utotal(self, x: TArray, /) -> TArray:
+        """
+        Total wave function at the point x, which is the sum of the incident and scattered wave functions.
+
+        Parameters
+        ----------
+        x : TArray
+            The point at which to evaluate the total wave function of shape (..., d (coordinates)).
+
+        Returns
+        -------
+        TArray
+            The value of the total wave function at x of shape (...,).
+
+        """
+        return self.uin(x) + self.uscat(x)
+
+
 def bem_matrix[TArray: Array](
     simplex_vertices: TArray,
     uin: Callable[[TArray], TArray],
@@ -131,10 +168,12 @@ def bem_matrix[TArray: Array](
     uin : Callable[[TArray], TArray]
         The incident wave function which takes
         x of shape (..., d) and returns a value of shape (...,).
-    k : float
+    k : TArray
         Wavenumber of the Helmholtz equation of shape (...,).
     quadrature_points_and_weights : tuple[TArray, TArray] | None, optional
         Quadrature points and weights for the integration, by default None.
+        points are of shape (n_quadrature, d (vertices)) (barycentric coordinates),
+        weights are of shape (n_quadrature,).
 
     Returns
     -------
@@ -145,14 +184,18 @@ def bem_matrix[TArray: Array](
 
     """
     xp = array_namespace(simplex_vertices, k)
-    # (..., n_simplex, d (coordinates))
+    # (..., n_simplex (x), d (coordinates))
     centers = xp.mean(simplex_vertices, axis=-1)
-    # (..., n_simplex, 1, d (coordinates))
+    # (..., n_simplex (x), 1, d (coordinates))
     centers = centers[..., :, None, :]
+    # (..., n_simplex (x), n_simplex (y))
     lhs = xp.asarray(1 / 2) + single_layer_potential(
-        centers, simplex_vertices, k, quadrature_points_and_weights
+        x=centers,
+        simplex_vertices=simplex_vertices[..., None, :, :, :],
+        k=k[..., None],
+        quadrature_points_and_weights=quadrature_points_and_weights,
     )
-    # (..., n_simplex, 1)
+    # (..., n_simplex (x), 1)
     rhs = uin(centers)
     if return_matrix:
         return lhs, rhs
@@ -162,4 +205,5 @@ def bem_matrix[TArray: Array](
         uin=uin,
         sol=sol,
         quadrature_points_and_weights=quadrature_points_and_weights,
+        k=k,
     )
