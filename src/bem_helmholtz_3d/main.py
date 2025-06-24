@@ -101,7 +101,7 @@ def single_layer_potential[TArray: Array](
     # print(xp.linalg.vector_norm(x[..., None, None, :] - points_simplex, axis=-1).sum(axis=-1))
     # (..., n_simplex, n_quadrature)
     fundamental_sol = fundamental_solution(xp.asarray(d), x[..., None, None, :] - points_simplex, k)
-    fundamental_sol = np.nan_to_num(fundamental_sol, nan=0.0)
+    # fundamental_sol = np.nan_to_num(fundamental_sol, nan=0.0)
     if xp.any(xp.isnan(fundamental_sol)):
         raise ValueError(
             "The fundamental solution contains NaN values. "
@@ -262,7 +262,7 @@ def bem[TArray: Array](
         sum_all_elements=False,
     )
     # (..., n_simplex (x), 1)
-    rhs = uin(centers)
+    rhs = -uin(centers)
     if return_matrix:
         return lhs, rhs
     if xp.any(xp.isnan(lhs)):
