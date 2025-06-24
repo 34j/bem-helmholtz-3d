@@ -54,7 +54,7 @@ wheels = [
 
 [[package]]
 name = "bem-helmholtz-3d"
-version = "0.0.0"
+version = "1.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "rich" },

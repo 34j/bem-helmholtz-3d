@@ -4,7 +4,7 @@ requires = [ "setuptools" ]
 
 [project]
 name = "bem-helmholtz-3d"
-version = "0.0.0"
+version = "1.0.0"
 description = "3D BEM for Helmholtz equation"
 readme = "README.md"
 license = { text = "MIT" }
