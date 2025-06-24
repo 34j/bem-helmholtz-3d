@@ -74,8 +74,7 @@ def single_layer_potential[TArray: Array](
     if d is None or d < 1:
         raise ValueError(f"The last dimension of simplex_vertices must be at least 1, got {d}.")
     if quadrature_points_and_weights is None:
-        # scheme = quadpy.tn.grundmann_moeller(d - 1, 2)
-        scheme = quadpy.tn.grundmann_moeller(d - 1, 7)
+        scheme = quadpy.tn.grundmann_moeller(d - 1, 2)
         points, weights = scheme.points.T, scheme.weights
     else:
         # (n_quadrature, d (vertices)), (n_quadrature,)
@@ -89,13 +88,14 @@ def single_layer_potential[TArray: Array](
         raise ValueError(
             "Weights must have the same shape as points except for the last dimension."
         )
-    # (..., n_simplex, d (coordinates), d (vertices)) ->
-    # (..., n_simplex, n_quadrature, d (coordinates), d (vertices))
-    # (n_quadrature, d (vertices)) -> (1, n_quadrature, 1, d (vertices))
+    # (..., n_simplex, d (vertices), d (coordinates)) ->
+    # (..., n_simplex, n_quadrature, d (vertices), d (coordinates))
+    # (n_quadrature, d (vertices)) -> (1, n_quadrature, d (vertices), 1)
     # (..., n_simplex, n_quadrature, d (coordinates))
     points_simplex = xp.vecdot(
-        simplex_vertices[..., :, None, :, :], points[None, :, None, :], axis=-1
+        simplex_vertices[..., :, None, :, :], points[None, :, :, None], axis=-2
     )
+    # print(xp.linalg.vector_norm(x[..., None, None, :] - points_simplex, axis=-1).sum(axis=-1))
     # (..., n_simplex, n_quadrature)
     fundamental_sol = fundamental_solution(xp.asarray(d), x[..., None, None, :] - points_simplex, k)
     fundamental_sol = np.nan_to_num(fundamental_sol, nan=0.0)
@@ -110,9 +110,10 @@ def single_layer_potential[TArray: Array](
     # (..., n_simplex)
     result = xp.vecdot(
         fundamental_sol,
-        weights * vol[..., None],
+        weights,
         axis=-1,
     )
+    result *= vol
     if sum_all_elements:
         if fx is None:
             result = xp.sum(result, axis=-1)
@@ -249,7 +250,7 @@ def bem[TArray: Array](
     xp = array_namespace(simplex_vertices, k)
     n_simplex = simplex_vertices.shape[-3]
     # (..., n_simplex (x), d (coordinates))
-    centers = xp.mean(simplex_vertices, axis=-1)
+    centers = xp.mean(simplex_vertices, axis=-2)
     # (..., n_simplex (x), n_simplex (y))
     lhs = 0.5 * xp.eye(n_simplex) + single_layer_potential(
         x=centers,
@@ -273,6 +274,7 @@ def bem[TArray: Array](
             f"NaN rate: {xp.sum(xp.isnan(rhs)) / rhs.size:.2%}."
         )
     sol = xp.linalg.solve(lhs, rhs)
+    # print(centers, lhs, rhs, sol)
     return BEMCalculator(
         simplex_vertices=simplex_vertices,
         uin=uin,
