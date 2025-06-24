@@ -37,16 +37,17 @@ def test_bem():
     fig.savefig("tests/simplex.png")
     calc = bem(simplex_vertices=simplex_vertices, k=xp.asarray(k), uin=uin)
 
-    x, y = xp.meshgrid(xp.linspace(-4, 4, 20), xp.linspace(-4, 4, 20), indexing="ij")
+    x, y = xp.meshgrid(xp.linspace(-4, 4, 100), xp.linspace(-4, 4, 100), indexing="ij")
     points = xp.stack([x, y], axis=-1)
     for name, u in [
         ("uin", calc.uin(points)),
         ("uscat", calc.uscat(points)),
         ("utotal", calc.utotal(points)),
     ]:
+        u[x**2 + y**2 < 1] = 0  # zero inside the unit circle
         # heatmap
         fig, ax = plt.subplots()
-        c = ax.pcolormesh(x, y, xp.real(u), shading="auto")
-        ax.set_title("Real part of the total potential")
+        c = ax.pcolormesh(x, y, xp.real(u), shading="auto", cmap="bwr", vmin=-1, vmax=1)
+        ax.set_title(f"Re({name})")
         fig.colorbar(c, ax=ax)
         fig.savefig(f"tests/{name}.png")

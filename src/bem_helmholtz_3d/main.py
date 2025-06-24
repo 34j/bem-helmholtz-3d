@@ -3,7 +3,6 @@ from typing import Literal, overload
 
 import attrs
 import numpy as np
-import quadpy
 from array_api._2024_12 import Array
 from array_api_compat import array_namespace
 
@@ -74,8 +73,12 @@ def single_layer_potential[TArray: Array](
     if d is None or d < 1:
         raise ValueError(f"The last dimension of simplex_vertices must be at least 1, got {d}.")
     if quadrature_points_and_weights is None:
-        scheme = quadpy.tn.grundmann_moeller(d - 1, 2)
-        points, weights = scheme.points.T, scheme.weights
+        # scheme = quadpy.tn.grundmann_moeller(d - 1, 2)
+        # points, weights = scheme.points.T, scheme.weights
+        N = 20
+        points = (xp.arange(N) + 0.5) / N
+        points = xp.stack([points, 1 - points], axis=-1)
+        weights = xp.ones((N,)) / N
     else:
         # (n_quadrature, d (vertices)), (n_quadrature,)
         points, weights = quadrature_points_and_weights
@@ -248,11 +251,10 @@ def bem[TArray: Array](
 
     """
     xp = array_namespace(simplex_vertices, k)
-    n_simplex = simplex_vertices.shape[-3]
     # (..., n_simplex (x), d (coordinates))
     centers = xp.mean(simplex_vertices, axis=-2)
     # (..., n_simplex (x), n_simplex (y))
-    lhs = 0.5 * xp.eye(n_simplex) + single_layer_potential(
+    lhs = single_layer_potential(
         x=centers,
         simplex_vertices=simplex_vertices[..., None, :, :, :],
         k=k[..., None],
@@ -274,7 +276,6 @@ def bem[TArray: Array](
             f"NaN rate: {xp.sum(xp.isnan(rhs)) / rhs.size:.2%}."
         )
     sol = xp.linalg.solve(lhs, rhs)
-    # print(centers, lhs, rhs, sol)
     return BEMCalculator(
         simplex_vertices=simplex_vertices,
         uin=uin,
