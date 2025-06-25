@@ -43,6 +43,7 @@ scripts.bem-helmholtz-3d = "bem_helmholtz_3d.cli:app"
 
 [dependency-groups]
 dev = [
+  "bempp-cl>=0.4.2",
   "pytest>=8,<9",
   "pytest-cov>=6,<7",
 ]
