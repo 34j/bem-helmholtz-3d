@@ -26,8 +26,14 @@ classifiers = [
 ]
 
 dependencies = [
+  "array-api-compat>=1.11.2",
+  "attrs>=25.3.0",
+  "legacy-quadpy>=0.16.10",
+  "matplotlib>=3.9.4",
+  "meshio>=5.3.5",
   "rich>=10",
   "typer>=0.15,<1",
+  "types-array-api>=1.1.2",
 ]
 urls."Bug Tracker" = "https://github.com/34j/bem-helmholtz-3d/issues"
 urls.Changelog = "https://github.com/34j/bem-helmholtz-3d/blob/main/CHANGELOG.md"
@@ -37,8 +43,12 @@ scripts.bem-helmholtz-3d = "bem_helmholtz_3d.cli:app"
 
 [dependency-groups]
 dev = [
+  "bempp-cl>=0.4.2",
+  "jordan-form>=0.0.0",
   "pytest>=8,<9",
   "pytest-cov>=6,<7",
+  "ss-hankel>=0.0.0",
+  "tqdm>=4.67.1",
 ]
 docs = [
   "furo>=2023.5.20; python_version>='3.11'",
@@ -48,7 +58,7 @@ docs = [
 ]
 
 [tool.ruff]
-line-length = 88
+line-length = 100
 lint.select = [
   "B",   # flake8-bugbear
   "D",   # flake8-docstrings
@@ -68,6 +78,7 @@ lint.ignore = [
   "D104", # Missing docstring in public package
   "D107", # Missing docstring in `__init__`
   "D401", # First line of docstring should be in imperative mood
+  "RUF002"
 ]
 lint.per-file-ignores."conftest.py" = [ "D100" ]
 lint.per-file-ignores."docs/conf.py" = [ "D100" ]
