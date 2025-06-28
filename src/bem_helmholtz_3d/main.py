@@ -47,6 +47,7 @@ def single_layer_potential[TArray: Array](
         (..., n_simplex) if sum_all_elements is False.
 
     """
+    # check shapes
     xp = array_namespace(x, simplex_vertices)
     if not (x.shape[-1] == simplex_vertices.shape[-2] == simplex_vertices.shape[-1]):
         raise ValueError(
@@ -58,24 +59,29 @@ def single_layer_potential[TArray: Array](
             f"The last dimension of fx must match the number of simplices, "
             f"got {fx.shape=} and {simplex_vertices.shape=}."
         )
-    extra_shapes = [x.shape[:-1], simplex_vertices.shape[:-3], k.shape]
-    if fx is not None:
-        extra_shapes.append(fx.shape[:-1])
-    if xp.unique_values([len(s) for s in extra_shapes]).size != 1:
+    try:
+        extra_shapes = [x.shape[:-1], simplex_vertices.shape[:-3], k.shape]
+        if fx is not None:
+            extra_shapes.append(fx.shape[:-1])
+        if xp.unique_values([len(s) for s in extra_shapes]).size != 1:
+            raise ValueError()
+        np.broadcast_shapes(*[tuple(s) for s in extra_shapes])
+    except Exception as e:
         raise ValueError(
             "The shapes of x, simplex_vertices, k, and fx must be compatible. "
             f"Got {x.shape=}, {simplex_vertices.shape=}, {k.shape=}"
             + (f", {fx.shape=}" if fx is not None else "")
             + f", {extra_shapes=}."
-        )
-    np.broadcast_shapes(*[tuple(s) for s in extra_shapes])
+        ) from e
     d = simplex_vertices.shape[-1]
     if d is None or d < 1:
         raise ValueError(f"The last dimension of simplex_vertices must be at least 1, got {d}.")
+
+    # check points and weights
     if quadrature_points_and_weights is None:
         # scheme = quadpy.tn.grundmann_moeller(d - 1, 2)
         # points, weights = scheme.points.T, scheme.weights
-        N = 20
+        N = 50
         points = (xp.arange(N) + 0.5) / N
         points = xp.stack([points, 1 - points], axis=-1)
         weights = xp.ones((N,)) / N
@@ -98,9 +104,14 @@ def single_layer_potential[TArray: Array](
     points_simplex = xp.vecdot(
         simplex_vertices[..., :, None, :, :], points[None, :, :, None], axis=-2
     )
+    # fig, ax = plt.subplots()
+    # for i in range(points_simplex.shape[-3]):
+    #     ax.scatter(points_simplex[..., i, :, 0], points_simplex[..., i, :, 1])
+    # fig.savefig("tests/points_simplex.png")
     # print(xp.linalg.vector_norm(x[..., None, None, :] - points_simplex, axis=-1).sum(axis=-1))
     # (..., n_simplex, n_quadrature)
     fundamental_sol = fundamental_solution(xp.asarray(d), x[..., None, None, :] - points_simplex, k)
+    # fundamental_sol = 1j/4 * hankel1(0, k * xp.linalg.vector_norm(x[..., None, None, :] - points_simplex, axis=-1))
     # fundamental_sol = np.nan_to_num(fundamental_sol, nan=0.0)
     if xp.any(xp.isnan(fundamental_sol)):
         raise ValueError(

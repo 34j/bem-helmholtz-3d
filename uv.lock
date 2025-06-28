@@ -106,8 +106,13 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "bempp-cl" },
+    { name = "jordan-form", version = "0.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
+    { name = "jordan-form", version = "1.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "pytest" },
     { name = "pytest-cov" },
+    { name = "ss-hankel", version = "0.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
+    { name = "ss-hankel", version = "1.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+    { name = "tqdm" },
 ]
 docs = [
     { name = "furo", marker = "python_full_version >= '3.11'" },
@@ -131,8 +136,11 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "bempp-cl", specifier = ">=0.4.2" },
+    { name = "jordan-form", specifier = ">=0.0.0" },
     { name = "pytest", specifier = ">=8,<9" },
     { name = "pytest-cov", specifier = ">=6,<7" },
+    { name = "ss-hankel", specifier = ">=0.0.0" },
+    { name = "tqdm", specifier = ">=4.67.1" },
 ]
 docs = [
     { name = "furo", marker = "python_full_version >= '3.11'", specifier = ">=2023.5.20" },
@@ -521,6 +529,31 @@ wheels = [
 ]
 
 [[package]]
+name = "cyclopts"
+version = "3.20.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "attrs", marker = "python_full_version >= '3.10'" },
+    { name = "docstring-parser", marker = "python_full_version >= '3.10' and python_full_version < '4.0'" },
+    { name = "rich", marker = "python_full_version >= '3.10'" },
+    { name = "rich-rst", marker = "python_full_version >= '3.10'" },
+    { name = "typing-extensions", marker = "python_full_version == '3.10.*'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/25/d8/b9592e5bb84500be07d2080ccc7d1806850cec588b68628c1fb92cc9076d/cyclopts-3.20.0.tar.gz", hash = "sha256:999aac0e3480c521d2424bf928b3a7e1288c4b3007b0e004550cd4dbb6331b06", size = 73915, upload-time = "2025-06-24T15:47:29.488Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/df/1e/8c463d09961430fafd25d35862939107044453042161c788ae255b7c6f87/cyclopts-3.20.0-py3-none-any.whl", hash = "sha256:585c7dbce09d5e3cc2601f4beed31de590e7c219e235328055c0aa283382fc72", size = 83850, upload-time = "2025-06-24T15:47:28.32Z" },
+]
+
+[[package]]
+name = "docstring-parser"
+version = "0.16"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/08/12/9c22a58c0b1e29271051222d8906257616da84135af9ed167c9e28f85cb3/docstring_parser-0.16.tar.gz", hash = "sha256:538beabd0af1e2db0146b6bd3caa526c35a34d61af9fd2887f3a8a27a739aa6e", size = 26565, upload-time = "2024-03-15T10:39:44.419Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d5/7c/e9fcff7623954d86bdc17782036cbf715ecab1bec4847c008557affe1ca8/docstring_parser-0.16-py3-none-any.whl", hash = "sha256:bf0a1387354d3691d102edef7ec124f219ef639982d096e26e3b60aeffa90637", size = 36533, upload-time = "2024-03-15T10:39:41.527Z" },
+]
+
+[[package]]
 name = "docutils"
 version = "0.21.2"
 source = { registry = "https://pypi.org/simple" }
@@ -663,6 +696,44 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/df/bf/f7da0350254c0ed7c72f3e33cef02e048281fec7ecec5f032d4aac52226b/jinja2-3.1.6.tar.gz", hash = "sha256:0137fb05990d35f1275a587e9aee6d56da821fc83491a0fb838183be43f66d6d", size = 245115, upload-time = "2025-03-05T20:05:02.478Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/62/a1/3d680cbfd5f4b8f15abc1d571870c5fc3e594bb582bc3b64ea099db13e56/jinja2-3.1.6-py3-none-any.whl", hash = "sha256:85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67", size = 134899, upload-time = "2025-03-05T20:05:00.369Z" },
+]
+
+[[package]]
+name = "jordan-form"
+version = "0.0.0"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version < '3.10'",
+]
+dependencies = [
+    { name = "rich", marker = "python_full_version < '3.10'" },
+    { name = "typer", marker = "python_full_version < '3.10'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f5/70/3e725f9b8dc6bd5f5add06d53a5777d6dcf7de90462876c6e0415bfa2402/jordan_form-0.0.0.tar.gz", hash = "sha256:d256a72348e6a7be18ac50d7c2b089ad9c1db6a4c0b2af53d29b99f751a8505e", size = 5706, upload-time = "2025-05-02T08:57:18.922Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/eb/b2/8cc6946bbba751436bc001ed3722afa40b930094e053199b0ddd4c374e93/jordan_form-0.0.0-py3-none-any.whl", hash = "sha256:a629fcc201ae03fa9f440993f9436bfde6e0aaf7ffc7d0e7e24a5f8799cbea00", size = 4640, upload-time = "2025-05-02T08:57:17.466Z" },
+]
+
+[[package]]
+name = "jordan-form"
+version = "1.0.0"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.11'",
+    "python_full_version == '3.10.*'",
+]
+dependencies = [
+    { name = "attrs", marker = "python_full_version >= '3.10'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+    { name = "rich", marker = "python_full_version >= '3.10'" },
+    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.10.*'" },
+    { name = "scipy", version = "1.16.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "sympy", marker = "python_full_version >= '3.10'" },
+    { name = "typer", marker = "python_full_version >= '3.10'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c7/86/120ceb8b48bc57cde6dc4c4aa1b1bb3dd544ddf7d8b6ed61bda642502488/jordan_form-1.0.0.tar.gz", hash = "sha256:2c7892454d71441d96706ff775e1119486d0426fbd6c0b4f727fb19141e5271f", size = 15642, upload-time = "2025-05-26T22:45:59.076Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1e/7a/caf83e4837b4fae0f00f50927fe642a273bb0a98f67f62a5170189da459c/jordan_form-1.0.0-py3-none-any.whl", hash = "sha256:96d5dfa89078b06cb09b34ef6af95f30b339fe3b5b64a3092651c9b07280f743", size = 13337, upload-time = "2025-05-26T22:45:57.651Z" },
 ]
 
 [[package]]
@@ -1639,6 +1710,19 @@ wheels = [
 ]
 
 [[package]]
+name = "rich-rst"
+version = "1.3.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "docutils", marker = "python_full_version >= '3.10'" },
+    { name = "rich", marker = "python_full_version >= '3.10'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b0/69/5514c3a87b5f10f09a34bb011bc0927bc12c596c8dae5915604e71abc386/rich_rst-1.3.1.tar.gz", hash = "sha256:fad46e3ba42785ea8c1785e2ceaa56e0ffa32dbe5410dec432f37e4107c4f383", size = 13839, upload-time = "2024-04-30T04:40:38.125Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/fd/bc/cc4e3dbc5e7992398dcb7a8eda0cbcf4fb792a0cdb93f857b478bf3cf884/rich_rst-1.3.1-py3-none-any.whl", hash = "sha256:498a74e3896507ab04492d326e794c3ef76e7cda078703aa592d1853d91098c1", size = 11621, upload-time = "2024-04-30T04:40:32.619Z" },
+]
+
+[[package]]
 name = "roman-numerals-py"
 version = "3.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1951,6 +2035,44 @@ wheels = [
 ]
 
 [[package]]
+name = "ss-hankel"
+version = "0.0.0"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version < '3.10'",
+]
+dependencies = [
+    { name = "rich", marker = "python_full_version < '3.10'" },
+    { name = "typer", marker = "python_full_version < '3.10'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/80/38/4bb32c09341dc44a710ad0cd09cfa80dbab9b88bbbf5a1aab2fbceeabfd3/ss_hankel-0.0.0.tar.gz", hash = "sha256:e0a9abb3ae313a136339f14d1df774c5d865eaca3039c6b512dd5c3cd7a0f106", size = 5717, upload-time = "2025-05-01T09:32:35.765Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/da/91/dda084fb77ee9fe69555cfb3a02eddd41f2cf29e84b96f99860703ddc416/ss_hankel-0.0.0-py3-none-any.whl", hash = "sha256:cc8a6bcc65037e86154704d5a140fad6a29b5a4bfc10efe845edfabac5ecab2e", size = 4606, upload-time = "2025-05-01T09:32:34.541Z" },
+]
+
+[[package]]
+name = "ss-hankel"
+version = "1.0.0"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.11'",
+    "python_full_version == '3.10.*'",
+]
+dependencies = [
+    { name = "attrs", marker = "python_full_version >= '3.10'" },
+    { name = "cyclopts", marker = "python_full_version >= '3.10'" },
+    { name = "rich", marker = "python_full_version >= '3.10'" },
+    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.10.*'" },
+    { name = "scipy", version = "1.16.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "sympy", marker = "python_full_version >= '3.10'" },
+    { name = "typing-extensions", marker = "python_full_version >= '3.10'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a0/d3/c182b4724f6c632d8b1f0dd52fd24705ca4bed581e22107bf6a789371373/ss_hankel-1.0.0.tar.gz", hash = "sha256:69b5d9f5bf3aeffc44b83649e50be6984323bfb42d610dc88df590b91708db77", size = 16100, upload-time = "2025-05-26T02:58:00.406Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a4/ca/1e71aa137f3c949b8f1685997fed85aabed8ce7cb70df7d9f5ecce78a8b6/ss_hankel-1.0.0-py3-none-any.whl", hash = "sha256:7979cdd3bbbc948dea59780c102eabad95cb82fa39de392d77f73422d6a3251e", size = 13016, upload-time = "2025-05-26T02:57:58.959Z" },
+]
+
+[[package]]
 name = "starlette"
 version = "0.47.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2012,6 +2134,18 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/5b/b9/1ed31d167be802da0fc95020d04cd27b7d7065cc6fbefdd2f9186f60d7bd/tomli-2.2.1-cp313-cp313-win32.whl", hash = "sha256:d3f5614314d758649ab2ab3a62d4f2004c825922f9e370b29416484086b264ec", size = 98724, upload-time = "2024-11-27T22:38:32.837Z" },
     { url = "https://files.pythonhosted.org/packages/c7/32/b0963458706accd9afcfeb867c0f9175a741bf7b19cd424230714d722198/tomli-2.2.1-cp313-cp313-win_amd64.whl", hash = "sha256:a38aa0308e754b0e3c67e344754dff64999ff9b513e691d0e786265c93583c69", size = 109383, upload-time = "2024-11-27T22:38:34.455Z" },
     { url = "https://files.pythonhosted.org/packages/6e/c2/61d3e0f47e2b74ef40a68b9e6ad5984f6241a942f7cd3bbfbdbd03861ea9/tomli-2.2.1-py3-none-any.whl", hash = "sha256:cb55c73c5f4408779d0cf3eef9f762b9c9f147a77de7b258bef0a5628adc85cc", size = 14257, upload-time = "2024-11-27T22:38:35.385Z" },
+]
+
+[[package]]
+name = "tqdm"
+version = "4.67.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "colorama", marker = "sys_platform == 'win32'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a8/4b/29b4ef32e036bb34e4ab51796dd745cdba7ed47ad142a9f4a1eb8e0c744d/tqdm-4.67.1.tar.gz", hash = "sha256:f8aef9c52c08c13a65f30ea34f4e5aac3fd1a34959879d7e59e63027286627f2", size = 169737, upload-time = "2024-11-24T20:12:22.481Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d0/30/dc54f88dd4a2b5dc8a0279bdd7270e735851848b762aeb1c1184ed1f6b14/tqdm-4.67.1-py3-none-any.whl", hash = "sha256:26445eca388f82e72884e0d580d5464cd801a3ea01e63e5601bdff9ba6a48de2", size = 78540, upload-time = "2024-11-24T20:12:19.698Z" },
 ]
 
 [[package]]

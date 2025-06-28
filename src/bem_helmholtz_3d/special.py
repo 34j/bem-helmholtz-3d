@@ -41,7 +41,7 @@ def sjv(
 
     """
     ivy = array_namespace(v, d, z)
-    if ((d > 2) & (v < 0)).any():
+    if ivy.any((d > 2) & (v < 0)):
         raise ValueError(
             "The hyperspherical Bessel function of "
             "the first kind is not defined for negative degrees."
@@ -89,7 +89,7 @@ def syv(
 
     """
     ivy = array_namespace(v, d, z)
-    if ((d > 2) & (v < 0)).any():
+    if ivy.any((d > 2) & (v < 0)):
         raise ValueError(
             "The hyperspherical Bessel function of "
             "the second kind is not defined for negative degrees."
