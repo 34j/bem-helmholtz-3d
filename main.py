@@ -10,11 +10,11 @@ from ss_hankel import ss_h_circle
 from tqdm import tqdm
 
 # http://www.bempp.org/operators_and_potentials.html
-origins = [
-    (0, 2, 0),
-    (0, -2, 0),
-]
-grid = union([sphere(h=0.15, origin=origin) for origin in origins])
+centers =[[ 0.        ,  0.        ,  0.        ],
+       [ 0.75646074, -3.86284462,  0.        ],
+       [ 4.42185842, -1.09750114,  0.        ]]
+radii = [1.0411, 0.9448001, 0.9448001]
+grid = union([sphere(h=0.3, origin=center, r=radius) for center, radius in zip(centers, radii)])
 piecewise_const_space = bempp_cl.api.function_space(grid, "DP", 0)
 k = 1
 
@@ -23,7 +23,7 @@ def f(ks, /):
     result = []
     for k in tqdm(ks):
         slp = single_layer(piecewise_const_space, piecewise_const_space, piecewise_const_space, k)
-        slp_discrete = slp.weak_form()
+        slp_discrete = slp.strong_form()
         mat = bempp_cl.api.as_matrix(slp_discrete)
         result.append(mat)
     return np.stack(result, axis=0)
@@ -31,11 +31,11 @@ def f(ks, /):
 
 res = ss_h_circle(
     f,
-    num_vectors=10,
-    max_order=10,
-    circle_n_points=128,
-    circle_center=0.7 - 1.3j,
-    circle_radius=0.5,
+    num_vectors=12,
+    max_order=12,
+    circle_n_points=4096,
+    circle_center=3.5-1j,
+    circle_radius=0.9,
 )
 print(res)
 fig, ax = plt.subplots()
