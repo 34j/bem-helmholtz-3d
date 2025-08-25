@@ -10,9 +10,7 @@ from ss_hankel import ss_h_circle
 from tqdm import tqdm
 
 # http://www.bempp.org/operators_and_potentials.html
-centers =[[ 0.        ,  0.        ,  0.        ],
-       [ 0.75646074, -3.86284462,  0.        ],
-       [ 4.42185842, -1.09750114,  0.        ]]
+centers = [[0.0, 0.0, 0.0], [0.75646074, -3.86284462, 0.0], [4.42185842, -1.09750114, 0.0]]
 radii = [1.0411, 0.9448001, 0.9448001]
 grid = union([sphere(h=0.3, origin=center, r=radius) for center, radius in zip(centers, radii)])
 piecewise_const_space = bempp_cl.api.function_space(grid, "DP", 0)
@@ -34,7 +32,7 @@ res = ss_h_circle(
     num_vectors=12,
     max_order=12,
     circle_n_points=4096,
-    circle_center=3.5-1j,
+    circle_center=3.5 - 1j,
     circle_radius=0.9,
 )
 print(res)
