@@ -13,7 +13,7 @@ from sphinx.ext import apidoc
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "bem-helmholtz-3d"
-copyright = "2025, 34j"
+copyright = "2025, 34j"  # noqa: A001
 author = "34j"
 release = "1.0.0"
 
@@ -73,17 +73,16 @@ def run_apidoc(_: Any) -> None:
     docs_path = Path(__file__).parent
     module_path = docs_path.parent / "src" / "bem_helmholtz_3d"
 
-    apidoc.main(
-        [
-            "--force",
-            "--module-first",
-            "-o",
-            docs_path.as_posix(),
-            module_path.as_posix(),
-        ]
-    )
+    apidoc.main([
+        "--force",
+        "--module-first",
+        "--no-toc",
+        "-o",
+        docs_path.as_posix(),
+        module_path.as_posix(),
+    ])
 
 
 def setup(app: Sphinx) -> None:
-    """Setup sphinx."""
+    """Set up Sphinx."""
     app.connect("builder-inited", run_apidoc)
