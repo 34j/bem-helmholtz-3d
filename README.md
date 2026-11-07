@@ -7,11 +7,11 @@
   <a href="https://bem-helmholtz-3d.readthedocs.io">
     <img src="https://img.shields.io/readthedocs/bem-helmholtz-3d.svg?logo=read-the-docs&logoColor=fff&style=flat-square" alt="Documentation Status">
   </a>
-</p>
-<p align="center">
   <a href="https://codecov.io/gh/34j/bem-helmholtz-3d">
     <img src="https://img.shields.io/codecov/c/github/34j/bem-helmholtz-3d.svg?logo=codecov&logoColor=fff&style=flat-square" alt="Test coverage percentage">
   </a>
+</p>
+<p align="center">
   <a href="https://github.com/astral-sh/uv">
     <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json" alt="uv">
   </a>
