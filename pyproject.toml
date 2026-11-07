@@ -47,9 +47,21 @@ docs = [
 
 [tool.ruff]
 extend = ".venv/ruff.toml"
+lint.extend-per-file-ignores."tests/**/*" = [ "S603" ]
 
 [tool.pyproject-fmt]
 max_supported_python = "3.14"
 
 [tool.ty]
 terminal.error-on-warning = true
+
+[tool.pytest]
+addopts = [
+  "-v",
+  "-Wonce",
+  "-p no:doctest",
+  "--cov=bem_helmholtz_3d",
+  "--cov-report=term",
+  "--cov-report=xml",
+]
+pythonpath = [ "src" ]

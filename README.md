@@ -44,6 +44,4 @@
 
 Install this via pip (or your favourite package manager):
 
-```shell
-pip install bem-helmholtz-3d
-```
+`pip install bem-helmholtz-3d`
